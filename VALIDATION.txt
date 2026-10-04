@@ -1,0 +1,11 @@
+Validation performed in the build environment:
+- JavaScript syntax (worker and dashboard)
+- Mocked Oracle duplicate rows and repeated polls: one send
+- Mocked WhatsApp offline: Oracle records remain pending
+- Ambiguous send: persisted as uncertain, no blind retry
+- Legacy sent keys suppress resends
+- Interrupted sending record survives restart as uncertain
+- Oracle query error remains visible; connection released
+- WhatsApp message text matches original function output
+
+Not tested here: real Oracle connection, real WhatsApp linking/sending, browser rendering, Windows PowerShell/Task Scheduler execution.
