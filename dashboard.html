@@ -1,0 +1,1635 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width,initial-scale=1"
+  >
+
+  <title>
+    ST3 · C2 WhatsApp Monitor
+  </title>
+
+  <style>
+    :root {
+      color-scheme: dark;
+
+      --bg: #0a1221;
+      --panel: #142136;
+      --panel2: #18283f;
+
+      --line: #293a51;
+
+      --text: #eef4fc;
+      --muted: #a9bad1;
+
+      --green: #63e4af;
+      --amber: #ffd17c;
+      --red: #ff9ead;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+
+      background: var(--bg);
+
+      color: var(--text);
+
+      font:
+        16px/1.5
+        system-ui,
+        sans-serif;
+    }
+
+    main {
+      max-width: 1600px;
+
+      margin: auto;
+
+      padding: 36px;
+    }
+
+    header {
+      display: flex;
+
+      justify-content:
+        space-between;
+
+      align-items: center;
+
+      gap: 20px;
+    }
+
+    h1 {
+      font-size: 30px;
+
+      margin:
+        3px
+        0
+        24px;
+    }
+
+    small,
+    .muted {
+      color:
+        var(--muted);
+    }
+
+    .label {
+      font-size: 14px;
+
+      letter-spacing: 2px;
+
+      color:
+        var(--green);
+    }
+
+    /* =====================================================
+       SYSTEM STATUS
+    ===================================================== */
+
+    .status {
+      display: grid;
+
+      grid-template-columns:
+        repeat(6, minmax(150px, 1fr));
+
+      gap: 1px;
+
+      background:
+        var(--line);
+
+      border:
+        1px solid
+        var(--line);
+
+      border-radius: 12px;
+
+      overflow: hidden;
+
+      margin-bottom: 24px;
+    }
+
+    .status-item {
+      background:
+        var(--panel);
+
+      padding:
+        18px
+        20px;
+    }
+
+    .status-item b {
+      display: block;
+
+      font-size: 12px;
+
+      letter-spacing: 1px;
+
+      color:
+        var(--muted);
+
+      margin-bottom: 5px;
+    }
+
+    .status-item span {
+      display: block;
+
+      font-weight: 600;
+    }
+
+    .connected {
+      color:
+        var(--green);
+    }
+
+    .warning {
+      color:
+        var(--amber);
+    }
+
+    .error {
+      color:
+        var(--red);
+    }
+
+    /* =====================================================
+       SUMMARY CARDS
+    ===================================================== */
+
+    .cards {
+      display: grid;
+
+      grid-template-columns:
+        repeat(4, 1fr);
+
+      gap: 16px;
+
+      margin:
+        24px
+        0;
+    }
+
+    .card {
+      background:
+        var(--panel);
+
+      padding:
+        24px;
+
+      border:
+        1px solid
+        var(--line);
+
+      border-radius:
+        14px;
+    }
+
+    .card-title {
+      color:
+        var(--muted);
+
+      font-size:
+        14px;
+    }
+
+    .card strong {
+      display:
+        block;
+
+      font-size:
+        44px;
+
+      line-height:
+        1.3;
+
+      margin-top:
+        4px;
+    }
+
+    .card:nth-child(2) strong {
+      color:
+        var(--green);
+    }
+
+    .card:nth-child(3) strong {
+      color:
+        var(--amber);
+    }
+
+    .card:nth-child(4) strong {
+      color:
+        var(--red);
+    }
+
+    /* =====================================================
+       WARNING BANNER
+    ===================================================== */
+
+    #banner {
+      padding:
+        14px
+        18px;
+
+      background:
+        #562c36;
+
+      border:
+        1px solid
+        #844250;
+
+      border-radius:
+        8px;
+
+      margin:
+        16px
+        0;
+    }
+
+    /* =====================================================
+       QR
+    ===================================================== */
+
+    #pair {
+      padding:
+        24px;
+
+      margin:
+        20px
+        0;
+
+      background:
+        var(--panel);
+
+      border-radius:
+        12px;
+    }
+
+    #pair img {
+      width:
+        240px;
+
+      max-width:
+        100%;
+
+      display:
+        block;
+
+      margin-top:
+        12px;
+    }
+
+    /* =====================================================
+       TOOLBAR
+    ===================================================== */
+
+    .toolbar {
+      display:
+        flex;
+
+      gap:
+        12px;
+
+      flex-wrap:
+        wrap;
+
+      margin:
+        30px
+        0
+        16px;
+    }
+
+    input,
+    select {
+      font:
+        inherit;
+
+      padding:
+        11px
+        14px;
+
+      border-radius:
+        8px;
+
+      border:
+        1px solid
+        var(--line);
+
+      background:
+        var(--panel);
+
+      color:
+        var(--text);
+    }
+
+    input {
+      flex:
+        1;
+
+      min-width:
+        200px;
+    }
+
+    /* =====================================================
+       TABLE
+    ===================================================== */
+
+    .table-wrap {
+      overflow:
+        auto;
+
+      background:
+        var(--panel);
+
+      border:
+        1px solid
+        var(--line);
+
+      border-radius:
+        12px;
+    }
+
+    table {
+      border-collapse:
+        collapse;
+
+      width:
+        100%;
+
+      white-space:
+        nowrap;
+    }
+
+    th {
+      text-align:
+        left;
+
+      font-size:
+        14px;
+
+      color:
+        var(--muted);
+
+      font-weight:
+        500;
+
+      background:
+        var(--panel2);
+    }
+
+    td,
+    th {
+      padding:
+        17px
+        16px;
+
+      border-bottom:
+        1px solid
+        var(--line);
+    }
+
+    td.detail {
+      white-space:
+        normal;
+
+      min-width:
+        230px;
+
+      max-width:
+        360px;
+    }
+
+    td small {
+      display:
+        block;
+
+      margin-top:
+        4px;
+    }
+
+    /* =====================================================
+       BADGES
+    ===================================================== */
+
+    .badge {
+      display:
+        inline-block;
+
+      padding:
+        5px
+        10px;
+
+      border-radius:
+        6px;
+
+      background:
+        #263b54;
+
+      font-size:
+        14px;
+
+      font-weight:
+        600;
+
+      margin-bottom:
+        3px;
+    }
+
+    .sent {
+      background:
+        #124538;
+
+      color:
+        #83f0c1;
+    }
+
+    .pending,
+    .sending {
+      background:
+        #4a391a;
+
+      color:
+        #ffd17c;
+    }
+
+    .uncertain {
+      background:
+        #563843;
+
+      color:
+        #ffd3dc;
+    }
+
+    #empty {
+      padding:
+        28px;
+
+      text-align:
+        center;
+
+      color:
+        var(--muted);
+    }
+
+    footer {
+      color:
+        var(--muted);
+
+      font-size:
+        14px;
+
+      margin-top:
+        16px;
+    }
+
+    .footer-note {
+      padding:
+        14px
+        16px;
+
+      background:
+        var(--panel);
+
+      border-radius:
+        8px;
+    }
+
+    @media (max-width: 1100px) {
+      .status {
+        grid-template-columns:
+          repeat(3, 1fr);
+      }
+    }
+
+    @media (max-width: 800px) {
+      main {
+        padding:
+          18px;
+      }
+
+      .cards {
+        grid-template-columns:
+          repeat(2, 1fr);
+      }
+
+      .status {
+        grid-template-columns:
+          repeat(2, 1fr);
+      }
+
+      .card {
+        padding:
+          16px;
+      }
+
+      .card strong {
+        font-size:
+          34px;
+      }
+
+      header {
+        display:
+          block;
+      }
+
+      h1 {
+        font-size:
+          25px;
+      }
+    }
+  </style>
+</head>
+
+
+<body>
+
+<main>
+
+  <!-- =====================================================
+       HEADER
+  ====================================================== -->
+
+  <header>
+
+    <div>
+
+      <div class="label">
+        GRI / ST3 QUALITY
+      </div>
+
+      <h1>
+        C2 WhatsApp Notifications
+      </h1>
+
+    </div>
+
+    <div
+      id="refresh"
+      class="muted"
+    >
+      Connecting to monitor…
+    </div>
+
+  </header>
+
+
+  <!-- =====================================================
+       ALERT
+  ====================================================== -->
+
+  <div
+    id="banner"
+    hidden
+    role="alert"
+  ></div>
+
+
+  <!-- =====================================================
+       SYSTEM HEALTH
+  ====================================================== -->
+
+  <section class="status">
+
+    <div class="status-item">
+
+      <b>
+        WHATSAPP
+      </b>
+
+      <span id="wa">
+        Starting…
+      </span>
+
+    </div>
+
+
+    <div class="status-item">
+
+      <b>
+        ORACLE
+      </b>
+
+      <span id="db">
+        Waiting for first query
+      </span>
+
+    </div>
+
+
+    <div class="status-item">
+
+      <b>
+        SQL SERVER
+      </b>
+
+      <span id="sql">
+        Checking…
+      </span>
+
+    </div>
+
+
+    <div class="status-item">
+
+      <b>
+        LAST ORACLE CHECK
+      </b>
+
+      <span id="checked">
+        —
+      </span>
+
+    </div>
+
+
+    <div class="status-item">
+
+      <b>
+        MONITOR HEARTBEAT
+      </b>
+
+      <span id="heartbeat">
+        —
+      </span>
+
+    </div>
+
+
+    <div class="status-item">
+
+      <b>
+        POLLING
+      </b>
+
+      <span id="poll">
+        —
+      </span>
+
+    </div>
+
+  </section>
+
+
+  <!-- =====================================================
+       COUNTS
+  ====================================================== -->
+
+  <section class="cards">
+
+    <div class="card">
+
+      <div class="card-title">
+        Tracked records
+      </div>
+
+      <strong id="total">
+        —
+      </strong>
+
+    </div>
+
+
+    <div class="card">
+
+      <div class="card-title">
+        Verified sent
+      </div>
+
+      <strong id="sent">
+        —
+      </strong>
+
+    </div>
+
+
+    <div class="card">
+
+      <div class="card-title">
+        Pending / sending
+      </div>
+
+      <strong id="pending">
+        —
+      </strong>
+
+    </div>
+
+
+    <div class="card">
+
+      <div class="card-title">
+        Needs verification
+      </div>
+
+      <strong id="uncertain">
+        —
+      </strong>
+
+    </div>
+
+  </section>
+
+
+  <!-- =====================================================
+       WHATSAPP PAIRING
+  ====================================================== -->
+
+  <section
+    id="pair"
+    hidden
+  >
+
+    <b>
+      Link WhatsApp once
+    </b>
+
+    <div>
+
+      Open WhatsApp →
+      Linked devices →
+      Link a device.
+
+      Scan this QR code.
+
+    </div>
+
+    <img
+      id="qr"
+      alt="WhatsApp device linking QR code"
+    >
+
+  </section>
+
+
+  <!-- =====================================================
+       FILTERS
+  ====================================================== -->
+
+  <div class="toolbar">
+
+    <input
+      id="search"
+      aria-label="Search notifications"
+      placeholder="Search barcode, order, serial or part…"
+    >
+
+
+    <select
+      id="filter"
+      aria-label="Notification status"
+    >
+
+      <option value="all">
+        All notifications
+      </option>
+
+      <option value="pending">
+        Pending / sending
+      </option>
+
+      <option value="sent">
+        Sent
+      </option>
+
+      <option value="uncertain">
+        Needs verification
+      </option>
+
+    </select>
+
+  </div>
+
+
+  <!-- =====================================================
+       TABLE
+  ====================================================== -->
+
+  <div class="table-wrap">
+
+    <table>
+
+      <thead>
+
+        <tr>
+
+          <th>
+            Barcode / serial
+          </th>
+
+          <th>
+            Order / press
+          </th>
+
+          <th>
+            Part / description
+          </th>
+
+          <th>
+            Oracle created
+          </th>
+
+          <th>
+            Status
+          </th>
+
+          <th>
+            Sent time / receipt
+          </th>
+
+        </tr>
+
+      </thead>
+
+
+      <tbody id="rows"></tbody>
+
+    </table>
+
+
+    <div id="empty">
+
+      Loading notifications…
+
+    </div>
+
+  </div>
+
+
+  <!-- =====================================================
+       FOOTER
+  ====================================================== -->
+
+  <footer id="scope"></footer>
+
+
+  <footer class="footer-note">
+
+    <b>
+      Status information:
+    </b>
+
+    Sent means the message was successfully verified in WhatsApp.
+    Delivery and read status may still be pending.
+
+    "Needs verification" means the message was sent or attempted,
+    but automatic WhatsApp confirmation is still being checked.
+
+  </footer>
+
+</main>
+
+
+<script>
+
+let latest = null;
+
+
+const el =
+  id =>
+    document.getElementById(id);
+
+
+const fmt =
+  value =>
+    value
+      ? new Date(value)
+          .toLocaleString()
+      : '—';
+
+
+function setState(
+  element,
+  text,
+  state
+) {
+
+  element.textContent =
+    text;
+
+  element.classList.remove(
+    'connected',
+    'warning',
+    'error'
+  );
+
+  if (state) {
+
+    element.classList.add(
+      state
+    );
+  }
+}
+
+
+/* ============================================================
+   TABLE CELL
+============================================================ */
+
+function cell(
+  tr,
+  value,
+  sub,
+  cls
+) {
+
+  const td =
+    document.createElement(
+      'td'
+    );
+
+
+  if (cls) {
+
+    td.className =
+      cls;
+  }
+
+
+  td.textContent =
+    value ?? '—';
+
+
+  if (sub) {
+
+    const small =
+      document.createElement(
+        'small'
+      );
+
+    small.textContent =
+      sub;
+
+    td.append(
+      small
+    );
+  }
+
+
+  tr.append(td);
+
+
+  return td;
+}
+
+
+/* ============================================================
+   STATUS DESCRIPTION
+============================================================ */
+
+function statusDescription(
+  record
+) {
+
+  if (
+    record.status ===
+    'uncertain'
+  ) {
+
+    return (
+      'Message sent or attempted; ' +
+      'automatic confirmation is pending.'
+    );
+  }
+
+
+  if (
+    record.status ===
+    'sending'
+  ) {
+
+    return (
+      'Sending message to WhatsApp…'
+    );
+  }
+
+
+  if (
+    record.status ===
+    'pending'
+  ) {
+
+    return (
+      'Waiting to send.'
+    );
+  }
+
+
+  return null;
+}
+
+
+/* ============================================================
+   RECEIPT
+============================================================ */
+
+function receiptText(
+  record
+) {
+
+  if (record.imported) {
+
+    return (
+      'Time unavailable'
+    );
+  }
+
+
+  if (
+    record.ack >= 3
+  ) {
+
+    return (
+      'Read receipt'
+    );
+  }
+
+
+  if (
+    record.ack === 2
+  ) {
+
+    return (
+      'Delivery receipt'
+    );
+  }
+
+
+  if (
+    record.ack === 1
+  ) {
+
+    return (
+      'Server acknowledged'
+    );
+  }
+
+
+  if (
+    record.ack === -1
+  ) {
+
+    return (
+      'WhatsApp reported failure'
+    );
+  }
+
+
+  if (
+    record.status ===
+    'uncertain'
+  ) {
+
+    return (
+      'Confirmation pending'
+    );
+  }
+
+
+  return (
+    'Receipt not confirmed'
+  );
+}
+
+
+/* ============================================================
+   RENDER TABLE
+============================================================ */
+
+function render() {
+
+  if (!latest) {
+
+    return;
+  }
+
+
+  const query =
+    el('search')
+      .value
+      .toLowerCase();
+
+
+  const filter =
+    el('filter')
+      .value;
+
+
+  const rows =
+    latest.rows
+      .filter(
+        record => {
+
+          const statusMatches =
+
+            filter === 'all'
+
+            ||
+
+            record.status ===
+              filter
+
+            ||
+
+            (
+              filter === 'pending'
+
+              &&
+
+              record.status ===
+                'sending'
+            );
+
+
+          const searchText =
+
+            [
+              record.row.BARCODE_ID,
+              record.row.SERIAL_NO,
+              record.row.ORDER_NO,
+              record.row.PART_NO,
+              record.row.PART_DESCRIPTION
+            ]
+
+              .join(' ')
+
+              .toLowerCase();
+
+
+          return (
+            statusMatches
+            &&
+            searchText.includes(
+              query
+            )
+          );
+        }
+      );
+
+
+  el('rows')
+    .replaceChildren();
+
+
+  for (
+    const record
+    of rows.slice(
+      0,
+      500
+    )
+  ) {
+
+    const tr =
+      document.createElement(
+        'tr'
+      );
+
+
+    cell(
+      tr,
+      record.row.BARCODE_ID,
+      record.row.SERIAL_NO
+    );
+
+
+    cell(
+      tr,
+      record.row.ORDER_NO,
+      record.row.PRESS_NO
+    );
+
+
+    cell(
+      tr,
+      record.row.PART_NO,
+      record.row.PART_DESCRIPTION,
+      'detail'
+    );
+
+
+    cell(
+      tr,
+      record.row.CREATED_DATE
+    );
+
+
+    const statusCell =
+      cell(
+        tr,
+        '',
+        statusDescription(
+          record
+        ),
+        'detail'
+      );
+
+
+    const badge =
+      document.createElement(
+        'span'
+      );
+
+
+    badge.className =
+      'badge ' +
+      record.status;
+
+
+    if (
+      record.status ===
+      'uncertain'
+    ) {
+
+      badge.textContent =
+        'Needs verification';
+
+    } else if (
+      record.status ===
+      'sending'
+    ) {
+
+      badge.textContent =
+        'Sending';
+
+    } else if (
+      record.status ===
+      'pending'
+    ) {
+
+      badge.textContent =
+        'Pending';
+
+    } else if (
+      record.status ===
+      'sent'
+    ) {
+
+      badge.textContent =
+        'Sent';
+
+    } else {
+
+      badge.textContent =
+        record.status;
+    }
+
+
+    statusCell.prepend(
+      badge
+    );
+
+
+    cell(
+      tr,
+
+      record.imported
+        ? 'Previously sent'
+        : fmt(
+            record.sentAt
+          ),
+
+      receiptText(
+        record
+      )
+    );
+
+
+    el('rows')
+      .append(tr);
+  }
+
+
+  el('empty').hidden =
+    rows.length > 0;
+
+
+  el('empty').textContent =
+    'No matching notifications.';
+
+
+  el('scope').textContent =
+
+    `Oracle is checked approximately every ` +
+
+    `${latest.pollSeconds} seconds for C2 records ` +
+
+    `within the ${latest.lookbackDays}-day lookback window. ` +
+
+    `Showing ${Math.min(
+      rows.length,
+      500
+    )} of ${rows.length} matching records.`;
+}
+
+
+/* ============================================================
+   REFRESH
+============================================================ */
+
+async function refresh() {
+
+  try {
+
+    const response =
+      await fetch(
+        '/api/status',
+        {
+          signal:
+            AbortSignal.timeout(
+              8000
+            )
+        }
+      );
+
+
+    if (!response.ok) {
+
+      throw new Error(
+        'Monitor unavailable'
+      );
+    }
+
+
+    latest =
+      await response.json();
+
+
+    /* COUNTS */
+
+    el('total').textContent =
+      latest.counts.total;
+
+
+    el('sent').textContent =
+      latest.counts.sent;
+
+
+    el('uncertain').textContent =
+      latest.counts.uncertain;
+
+
+    el('pending').textContent =
+
+      latest.counts.pending
+
+      +
+
+      latest.counts.sending;
+
+
+    /* WHATSAPP */
+
+    if (
+      latest.ready
+    ) {
+
+      setState(
+        el('wa'),
+        'Connected',
+        'connected'
+      );
+
+    } else {
+
+      setState(
+        el('wa'),
+        latest.waStatus ||
+          'Disconnected',
+        'warning'
+      );
+    }
+
+
+    /* ORACLE */
+
+    if (
+      latest.oracleError
+    ) {
+
+      setState(
+        el('db'),
+        'Query failed',
+        'error'
+      );
+
+    } else if (
+      latest.lastQuery
+    ) {
+
+      setState(
+        el('db'),
+        'Connected',
+        'connected'
+      );
+
+    } else {
+
+      setState(
+        el('db'),
+        'Waiting for first query',
+        'warning'
+      );
+    }
+
+
+    /* SQL SERVER */
+
+    if (
+      latest.sqlError
+    ) {
+
+      setState(
+        el('sql'),
+        'Connection problem',
+        'error'
+      );
+
+    } else {
+
+      setState(
+        el('sql'),
+        'Connected',
+        'connected'
+      );
+    }
+
+
+    /* TIMES */
+
+    el('checked')
+      .textContent =
+        fmt(
+          latest.lastQuery
+        );
+
+
+    el('heartbeat')
+      .textContent =
+        fmt(
+          latest.lastCycle
+        );
+
+
+    el('poll')
+      .textContent =
+        `${latest.pollSeconds} seconds`;
+
+
+    /* STALE ORACLE */
+
+    const stale =
+
+      latest.lastQuery
+
+      &&
+
+      Date.now()
+
+      -
+
+      Date.parse(
+        latest.lastQuery
+      )
+
+      >
+
+      180000;
+
+
+    const problems =
+      [];
+
+
+    if (
+      latest.oracleError
+    ) {
+
+      problems.push(
+        'Oracle: ' +
+        latest.oracleError
+      );
+    }
+
+
+    if (
+      latest.sqlError
+    ) {
+
+      problems.push(
+        'SQL Server: ' +
+        latest.sqlError
+      );
+    }
+
+
+    if (
+      stale
+    ) {
+
+      problems.push(
+        'Oracle data has not been refreshed recently.'
+      );
+    }
+
+
+    el('banner').hidden =
+      problems.length === 0;
+
+
+    el('banner').textContent =
+      problems.join(' ');
+
+
+    /* REFRESH LABEL */
+
+    el('refresh')
+      .textContent =
+
+        'Updated '
+
+        +
+
+        new Date()
+          .toLocaleTimeString()
+
+        +
+
+        ' · auto refresh 3s';
+
+
+    /* QR */
+
+    el('pair').hidden =
+      !latest.qrAvailable;
+
+
+    if (
+      latest.qrAvailable
+    ) {
+
+      el('qr').src =
+        '/api/qr?t=' +
+        Date.now();
+    }
+
+
+    render();
+
+  } catch (error) {
+
+    el('banner').hidden =
+      false;
+
+
+    el('banner').textContent =
+
+      'Monitor connection lost. ' +
+
+      'Displayed values may be out of date.';
+
+
+    el('refresh').textContent =
+
+      'Disconnected · retrying automatically';
+
+  } finally {
+
+    setTimeout(
+      refresh,
+      3000
+    );
+  }
+}
+
+
+/* ============================================================
+   EVENTS
+============================================================ */
+
+el('search')
+  .addEventListener(
+    'input',
+    render
+  );
+
+
+el('filter')
+  .addEventListener(
+    'change',
+    render
+  );
+
+
+refresh();
+
+</script>
+
+</body>
+
+</html>
