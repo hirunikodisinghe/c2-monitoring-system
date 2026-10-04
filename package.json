@@ -1,0 +1,1 @@
+{"name":"gri-c2-whatsapp-monitor","version":"2.0.0","private":true,"description":"Local Oracle-backed C2 notification monitor","scripts":{"start":"node index.js"},"engines":{"node":">=18.20"},"dependencies":{"dotenv":"^16.4.5","mssql":"^12.7.2","oracledb":"^6.7.0","qrcode":"^1.5.4","whatsapp-web.js":"^1.34.7"}}
