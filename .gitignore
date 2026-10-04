@@ -144,3 +144,13 @@ vite.config.ts.timestamp-*
 
 # Turbo
 .turbo
+
+
+# Local notification data
+/data/notifications.jsonl
+/data/notifications_backup.jsonl
+
+# Old backup copies
+/index_backup*.js
+/index_before*.js
+/dashboard_before*.html
